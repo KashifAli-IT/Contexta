@@ -112,7 +112,7 @@ Keep this table current — it is the fastest resume signal.
 | :--- | :--- | :--- | :--- |
 | 1 | Repository & toolchain baseline | `chore: establish repo baseline with gitignore, env template and tooling config` | ✅ |
 | 2 | Docker Compose infrastructure | `feat(infra): add compose stack for postgres, redis, qdrant and minio` | ✅ |
-| 3 | Backend skeleton & data models | `feat(backend): bootstrap FastAPI app, config, database and SQLAlchemy models` | ⬜ |
+| 3 | Backend skeleton & data models | `feat(backend): bootstrap FastAPI app, config, database and SQLAlchemy models` | ✅ |
 | 4 | Object storage & document CRUD | `feat(backend): add minio storage service and document upload/list/delete API` | ⬜ |
 | 5 | Ingestion worker & PDF parsing | `feat(worker): add arq worker with pdf parsing and parent-child chunking` | ⬜ |
 | 6 | Embeddings & hybrid Qdrant index | `feat(worker): add batch embeddings and dense+sparse bm25 hybrid indexing` | ⬜ |
@@ -1040,6 +1040,14 @@ GET    /api/v1/tts/voices
 | 2026-10-05 | S02.05 | `minio/minio` and `minio/mc` are **unpullable** in this environment (Docker Hub returns `pull access denied`; `quay.io/minio/*` returns 401). Replaced with **`rustfs/rustfs:latest`**, which speaks the same S3/MinIO API | Verified: bucket created and presigned URLs validate through the boto3 SigV4 round trip |
 | 2026-10-05 | S02.05 | `createbuckets` is a `python:3.12-slim` one-shot that pip-installs `boto3` and runs `infra/minio/createbuckets.py`, instead of a `mc` client container | No MinIO-family image is available to run `mc`; also removes the shell dependency |
 | 2026-10-05 | S02.08 | Added `MINIO_PUBLIC_ENDPOINT=http://localhost:9000` | Presigned URLs are signed against the Host header, so signing with the internal `http://minio:9000` would produce a URL the browser cannot resolve or validate |
+| 2026-10-05 | S03.01 | Dependency pins **generated from a verified install**, not hand-written. `requirements.in` holds direct deps; `requirements.txt` is the full resolved freeze. Resolved set has **no torch** (fastembed 0.8.1 is ONNX-only) | Removes guesswork; the image stays small. Key versions: fastapi 0.142.2, sqlalchemy 2.1.3, **langgraph 1.2.12**, langchain-core 1.6.6, pymupdf4llm 1.28.2, qdrant-client 1.19.1, fastembed 0.8.1, openai 3.24.0 |
+| 2026-10-05 | S03.03 | `backend/Dockerfile` is one dependency layer with thin `api` / `worker` targets (not separate dependency sets) | Both services share an identical pip layer, so one build serves both |
+| 2026-10-05 | S03.03 | `pyproject.toml` must be `COPY`d into the image | Without it `ruff`/`mypy`/`pytest` run with library defaults inside the container, silently ignoring the project's rules |
+| 2026-10-05 | S03.04 | List-valued settings use `Annotated[list[str], NoDecode]` | pydantic-settings JSON-decodes complex types in the *source* layer, before field validators run, so `a,b,c` raised `SettingsError` |
+| 2026-10-05 | S03.05 | `StorageClient` builds a **fresh** aioboto3 client per operation | `session.client(...)` returns a single-use context manager; caching it produced `cannot reuse already awaited coroutine` |
+| 2026-10-05 | S03.08 | Request-id/timing middleware is **raw ASGI**, not `BaseHTTPMiddleware` | The base class adds a task-queue hop that delays the first frame of a long-lived SSE stream |
+| 2026-10-05 | S03.06 | Enums use `enum.StrEnum`; `pyproject.toml` ruff config copied into image | `UP042` + correct `str()` behaviour, and project lint rules now actually apply |
+| 2026-10-05 | S03.06 | `ChatMessage` gained `session_id`, `trace`, `model`; `Document` gained `chunk_count`, `job_id`, `size_bytes`, `content_type` | The chat history/TTS endpoints address turns by `session_id`; `trace` backs the agent timeline UI |
 
 _(Add one row each time a plan step is deviated from — this is what makes the plan recoverable.)_
 

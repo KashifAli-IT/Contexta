@@ -1,0 +1,43 @@
+# Direct runtime dependencies. `requirements.txt` is generated from this file
+# by `scripts/resolve_requirements.py` so that every transitive pin is verified
+# against Python 3.12 before it reaches the Dockerfile.
+#
+# API service
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+python-multipart
+orjson
+structlog
+tenacity
+python-dotenv
+
+# Persistence
+sqlalchemy[asyncio]
+asyncpg
+alembic
+greenlet
+
+# Queue
+arq
+redis
+
+# HTTP clients
+httpx
+aioboto3
+edge-tts
+
+# LLM + agents
+openai
+langgraph
+langchain-core
+
+# Document parsing
+pymupdf
+pymupdf4llm
+
+# Retrieval stack
+fastembed
+qdrant-client
+flashrank

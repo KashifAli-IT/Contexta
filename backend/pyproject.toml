@@ -31,7 +31,41 @@ plugins = ["pydantic.mypy"]
 exclude = ["alembic/versions"]
 
 [[tool.mypy.overrides]]
-module = ["flashrank.*", "fastembed.*", "pymupdf4llm.*", "qdrant_client.*", "edge_tts.*", "arq.*"]
+# These ship without py.typed markers, so mypy cannot introspect them.
+module = [
+    "flashrank",
+    "flashrank.*",
+    "fastembed",
+    "fastembed.*",
+    "pymupdf",
+    "pymupdf.*",
+    "pymupdf4llm",
+    "pymupdf4llm.*",
+    "pymupdf_layout",
+    "pymupdf_layout.*",
+    "qdrant_client",
+    "qdrant_client.*",
+    "edge_tts",
+    "edge_tts.*",
+    "arq",
+    "arq.*",
+    "aioboto3",
+    "aioboto3.*",
+    "aiobotocore",
+    "aiobotocore.*",
+    "botocore",
+    "botocore.*",
+    "boto3",
+    "boto3.*",
+    "langgraph",
+    "langgraph.*",
+    "langchain_core",
+    "langchain_core.*",
+    "s3transfer",
+    "s3transfer.*",
+    "onnxruntime",
+    "onnxruntime.*",
+]
 ignore_missing_imports = true
 
 [tool.pydantic-mypy]
