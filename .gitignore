@@ -1,0 +1,44 @@
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.egg-info/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.npm/
+
+# Runtime data & artifacts
+data/
+uploads/
+models/
+qdrant_storage/
+*.log
+*.sqlite3
+*.db
+
+# IDE / OS
+.idea/
+.vscode/*
+!.vscode/settings.json.example
+.DS_Store
+Thumbs.db
+desktop.ini

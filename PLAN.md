@@ -110,7 +110,7 @@ Keep this table current — it is the fastest resume signal.
 
 | Stage | Title | Commit message | Status |
 | :--- | :--- | :--- | :--- |
-| 1 | Repository & toolchain baseline | `chore: establish repo baseline with gitignore, env template and tooling config` | ⬜ |
+| 1 | Repository & toolchain baseline | `chore: establish repo baseline with gitignore, env template and tooling config` | ✅ |
 | 2 | Docker Compose infrastructure | `feat(infra): add compose stack for postgres, redis, qdrant and minio` | ⬜ |
 | 3 | Backend skeleton & data models | `feat(backend): bootstrap FastAPI app, config, database and SQLAlchemy models` | ⬜ |
 | 4 | Object storage & document CRUD | `feat(backend): add minio storage service and document upload/list/delete API` | ⬜ |
@@ -1036,6 +1036,7 @@ GET    /api/v1/tts/voices
 | 2026-10-05 | Plan | Qdrant single collection with `dense` + `bm25` named vectors, server-side RRF | Matches README; one round trip |
 | 2026-10-05 | Plan | SSE via `fetch` streaming, not `EventSource` | `EventSource` cannot POST a JSON body |
 | 2026-10-05 | Plan | v0.1 is unauthenticated, `project_id` client-supplied | Scope control; flagged non-production |
+| 2026-10-05 | S01.01 | Docker Desktop is at `C:\Users\USER\AppData\Local\Programs\DockerDesktop\`, **not** the default `C:\Program Files\Docker\Docker\` | `Test-Path` on the default path returned False; engine verified `29.8.0 / linux` |
 
 _(Add one row each time a plan step is deviated from — this is what makes the plan recoverable.)_
 
