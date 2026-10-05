@@ -111,7 +111,7 @@ Keep this table current — it is the fastest resume signal.
 | Stage | Title | Commit message | Status |
 | :--- | :--- | :--- | :--- |
 | 1 | Repository & toolchain baseline | `chore: establish repo baseline with gitignore, env template and tooling config` | ✅ |
-| 2 | Docker Compose infrastructure | `feat(infra): add compose stack for postgres, redis, qdrant and minio` | ⬜ |
+| 2 | Docker Compose infrastructure | `feat(infra): add compose stack for postgres, redis, qdrant and minio` | ✅ |
 | 3 | Backend skeleton & data models | `feat(backend): bootstrap FastAPI app, config, database and SQLAlchemy models` | ⬜ |
 | 4 | Object storage & document CRUD | `feat(backend): add minio storage service and document upload/list/delete API` | ⬜ |
 | 5 | Ingestion worker & PDF parsing | `feat(worker): add arq worker with pdf parsing and parent-child chunking` | ⬜ |
@@ -1037,6 +1037,9 @@ GET    /api/v1/tts/voices
 | 2026-10-05 | Plan | SSE via `fetch` streaming, not `EventSource` | `EventSource` cannot POST a JSON body |
 | 2026-10-05 | Plan | v0.1 is unauthenticated, `project_id` client-supplied | Scope control; flagged non-production |
 | 2026-10-05 | S01.01 | Docker Desktop is at `C:\Users\USER\AppData\Local\Programs\DockerDesktop\`, **not** the default `C:\Program Files\Docker\Docker\` | `Test-Path` on the default path returned False; engine verified `29.8.0 / linux` |
+| 2026-10-05 | S02.05 | `minio/minio` and `minio/mc` are **unpullable** in this environment (Docker Hub returns `pull access denied`; `quay.io/minio/*` returns 401). Replaced with **`rustfs/rustfs:latest`**, which speaks the same S3/MinIO API | Verified: bucket created and presigned URLs validate through the boto3 SigV4 round trip |
+| 2026-10-05 | S02.05 | `createbuckets` is a `python:3.12-slim` one-shot that pip-installs `boto3` and runs `infra/minio/createbuckets.py`, instead of a `mc` client container | No MinIO-family image is available to run `mc`; also removes the shell dependency |
+| 2026-10-05 | S02.08 | Added `MINIO_PUBLIC_ENDPOINT=http://localhost:9000` | Presigned URLs are signed against the Host header, so signing with the internal `http://minio:9000` would produce a URL the browser cannot resolve or validate |
 
 _(Add one row each time a plan step is deviated from — this is what makes the plan recoverable.)_
 
