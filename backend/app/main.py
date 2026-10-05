@@ -42,6 +42,17 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.session_factory = session_factory
     app.state.redis = build_redis(settings)
 
+    # Producer side of the ingestion queue. The API only enqueues; the heavy
+    # parsing/embedding work happens in the `worker` service.
+    if settings.worker_dispatch_enabled:
+        from arq import create_pool
+
+        from app.workers.tasks import get_redis_settings
+
+        arq_settings = get_redis_settings()
+        app.state.arq_pool = await create_pool(arq_settings)
+        log.info("arq_pool_ready", host=arq_settings.host, port=arq_settings.port)
+
     # Object storage. Imported lazily so that importing the app stays cheap.
     from app.services.storage import StorageClient
 
@@ -54,6 +65,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         yield
     finally:
         log.info("shutdown")
+        arq_pool = getattr(app.state, "arq_pool", None)
+        if arq_pool is not None:
+            await arq_pool.aclose()
         await dispose_database()
         redis_client = getattr(app.state, "redis", None)
         if redis_client is not None:

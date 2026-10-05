@@ -41,6 +41,10 @@ docker compose run --rm api ruff format --check .
 docker compose run --rm api mypy app
 docker compose run --rm api python scripts/smoke_test.py
 
+# host ports: api 8010, frontend 3000, postgres 5432, redis 6379,
+# qdrant 6333, object storage 9000 / console 9001
+curl.exe -s http://localhost:8010/api/v1/health/ready
+
 # frontend
 cd frontend
 npm ci

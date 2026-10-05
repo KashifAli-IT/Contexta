@@ -74,12 +74,12 @@ Each stage ends with the same 4 beats:
 ### 1.2 Ports (fixed for the project lifetime)
 | Service | Host | Container |
 | :--- | :--- | :--- |
-| FastAPI | 8000 | 8000 |
+| FastAPI | **8010** (see §13 — host 8000 was taken) | 8000 |
 | Next.js | 3000 | 3000 |
 | PostgreSQL | 5432 | 5432 |
 | Redis | 6379 | 6379 |
 | Qdrant REST / gRPC | 6333 / 6334 | 6333 / 6334 |
-| MinIO API / Console | 9000 / 9001 | 9000 / 9001 |
+| Object storage API / console | 9000 / 9001 | 9000 / 9001 |
 
 ### 1.3 Core Data Model (from README, final)
 - **Document**: `id UUID PK`, `title`, `file_url`, `file_key` (S3 object key), `size_bytes`,
@@ -113,7 +113,7 @@ Keep this table current — it is the fastest resume signal.
 | 1 | Repository & toolchain baseline | `chore: establish repo baseline with gitignore, env template and tooling config` | ✅ |
 | 2 | Docker Compose infrastructure | `feat(infra): add compose stack for postgres, redis, qdrant and minio` | ✅ |
 | 3 | Backend skeleton & data models | `feat(backend): bootstrap FastAPI app, config, database and SQLAlchemy models` | ✅ |
-| 4 | Object storage & document CRUD | `feat(backend): add minio storage service and document upload/list/delete API` | ⬜ |
+| 4 | Object storage & document CRUD | `feat(backend): add minio storage service and document upload/list/delete API` | ✅ |
 | 5 | Ingestion worker & PDF parsing | `feat(worker): add arq worker with pdf parsing and parent-child chunking` | ⬜ |
 | 6 | Embeddings & hybrid Qdrant index | `feat(worker): add batch embeddings and dense+sparse bm25 hybrid indexing` | ⬜ |
 | 7 | Retrieval service (RRF) | `feat(services): add parallel dense and bm25 retrieval with rrf fusion` | ⬜ |
@@ -1048,6 +1048,11 @@ GET    /api/v1/tts/voices
 | 2026-10-05 | S03.08 | Request-id/timing middleware is **raw ASGI**, not `BaseHTTPMiddleware` | The base class adds a task-queue hop that delays the first frame of a long-lived SSE stream |
 | 2026-10-05 | S03.06 | Enums use `enum.StrEnum`; `pyproject.toml` ruff config copied into image | `UP042` + correct `str()` behaviour, and project lint rules now actually apply |
 | 2026-10-05 | S03.06 | `ChatMessage` gained `session_id`, `trace`, `model`; `Document` gained `chunk_count`, `job_id`, `size_bytes`, `content_type` | The chat history/TTS endpoints address turns by `session_id`; `trace` backs the agent timeline UI |
+| 2026-10-05 | S04.01 | **API host port moved 8000 → 8010** (`API_PORT=8010`) | An unrelated Python service on this machine already listens on host port 8000 (a catalog/quotes/tools API). It is not ours, so it was left untouched. Symptom was a confusing `{"detail":"Not Found"}` 404 from the wrong service |
+| 2026-10-05 | S04.01 | Arq log line uses `RedisSettings.host/port` | arq 0.28's `RedisSettings` has no `queue_name`, and `ArqRedis` has neither `name` nor `redis_name` |
+| 2026-10-05 | S04.04 | `POST /documents` takes `project_id` as an explicit **Form** field; the `ProjectDep` dependency (query/header) is used by the non-body routes | The shared dependency cannot see multipart form fields, so an upload without the query param 422'd |
+| 2026-10-05 | S04.04 | `GET /documents/{id}/file` returns **302** (not 307) | Matches the documented API surface exactly |
+| 2026-10-05 | S04.06 | Added `scripts/seed_demo_pdf.py` and `./data` + `./scripts` volume mounts | Stage 4's acceptance test needs a real PDF; PyMuPDF 1.28 requires `pymupdf.Point`, not `(x, y)` tuples |
 
 _(Add one row each time a plan step is deviated from — this is what makes the plan recoverable.)_
 

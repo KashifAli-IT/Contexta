@@ -77,6 +77,11 @@ class ValidationError(AppError):
     code = "validation_error"
 
 
+class PayloadTooLargeError(AppError):
+    status_code = status.HTTP_413_CONTENT_TOO_LARGE
+    code = "payload_too_large"
+
+
 class UpstreamError(AppError):
     status_code = status.HTTP_502_BAD_GATEWAY
     code = "upstream_error"
