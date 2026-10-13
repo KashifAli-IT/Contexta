@@ -51,7 +51,7 @@ The platform operates on a decoupled architecture separating the **UI / Presenta
 │  └─────────────────────────┘ └─────────────────┘ └───────────────────┘  │
 └────────────────────────────────────────────────────────────────────────┘
 ```
-
+https://gitdiagram.com/kashifali-it/contexta
 ---
 
 ## 🧩 Tech Stack
